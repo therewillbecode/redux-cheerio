@@ -1,3 +1,8 @@
+// verifies that action should be handled by middleware
+export function isScrapingTask(){
+
+}
+
 function createScraperMiddleware() {
 	return ({ dispatch, getState }) => next => action => {
 	   
