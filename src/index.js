@@ -1,4 +1,4 @@
-function createPhantomMiddleware() {
+function createScraperMiddleware() {
 	return ({ dispatch, getState }) => next => action => {
 	   
 
@@ -6,7 +6,7 @@ function createPhantomMiddleware() {
 	}
 }
 
-const phantomMiddleware = createPhantomMiddleware();
+const scraperMiddleware = createScraperMiddleware();
 
-export default phantomMiddleware;
+export default scraperMiddleware;
 
