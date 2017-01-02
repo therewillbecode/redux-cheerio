@@ -13,6 +13,7 @@ describe('phantom middleware', () => {
     describe('handle next', () => {
       it('must return a function to handle action', () => {
         const actionHandler = nextHandler();
+        
         expect(actionHandler).to.be.a('function')
       });
     });
