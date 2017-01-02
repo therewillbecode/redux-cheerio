@@ -1,7 +1,7 @@
-# redux-scraper
-Cheerio based Web scraping middleware for Redux - redux middleware
+# cheerio-scraper
+Cheerio middleware for Redux - redux middleware
 
-Scraping is done using Cheerio and Request
+Scraping is done using Cheerio and axios
 
 ## Rationale
 
