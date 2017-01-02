@@ -1,14 +1,16 @@
 {
-  "name": "phantomjs-redux",
+  "name": "redux-scraper",
   "version": "1.0.0",
-  "description": "phantomjs Web scraping middleware for Redux - run phantomjs scripts as redux middleware",
+  "description": "cheerio based Web scraping middleware for Redux - run cheerio scripts as redux middleware",
   "main": "src/index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
     "chai": "^3.5.0",
-    "chai-as-promised": "^6.0.0"
+    "chai-as-promised": "^6.0.0",
+    "cheerio": "^0.22.0",
+    "request": "^2.79.0"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
