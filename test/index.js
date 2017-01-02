@@ -49,6 +49,37 @@ describe('phantom middleware', () => {
 
         expect(actionHandler).to.be.a('function')
       });
+
+    describe('handle action', () => {
+        describe('when action is a scraping task', () => {
+          it('must run the given action with dispatch and getState', done => {
+            const actionHandler = nextHandler();
+
+            actionHandler((dispatch, getState) => {
+              expect(dispatch).to.eql(doDispatch);
+              expect(getState).to.eql(doGetState);
+              done();
+            });
+
+           });
+
+        });
+
+        describe('when action is not a scraping task', () => {
+          it('must pass action to next if not a scraping task', done => {
+            const actionObj = {};
+
+            const actionHandler = nextHandler(action => {
+            expect(action).to.eql(actionObj);
+            done();
+          });
+
+          actionHandler(actionObj);
+         });
+        });
+    });
+        
+  });
 })
 
   describe('isScrapingTask', () => {
