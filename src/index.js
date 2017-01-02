@@ -1,6 +1,11 @@
-// verifies that action should be handled by middleware
-export function isScrapingTask(){
+const isString = (myVar) =>  typeof myVar === 'string' || myVar instanceof String
 
+// verifies that action should be handled by middleware
+export function isScrapingTask(action){
+	if(typeof action.payload.scrapeTask.task === 'function'  && isString(action.payload.scrapeTask.url) === true){
+		return true
+	}
+    return false
 }
 
 function createScraperMiddleware() {
