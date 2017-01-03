@@ -2,11 +2,17 @@ const isString = (myVar) =>  typeof myVar === 'string' || myVar instanceof Strin
 
 // verifies that action should be handled by middleware
 export function isScrapingTask(action){
-		if(isString(action.payload.scrapeTask.jQuerySelector) === true  
-         && isString(action.payload.scrapeTask.url) === true){
+		try {
+      if(isString(action.payload.jQuerySelector) === true  
+         && isString(action.payload.url) === true){
       return true
     }
-   
+   }
+   catch(e){
+    if(e instanceof TypeError === true){
+      return false
+    }
+   }
     return false
 }
 

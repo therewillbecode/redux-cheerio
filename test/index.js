@@ -12,14 +12,13 @@ let pendingAction;
 let fulfilledAction;
 let rejectedAction;
 
-let payload = {
- url: 'www.google.com',
- jQuerySelector: 'div'
-}
-
 const defaultScrapingAction = {
- type: 'ACTION', 
- payload
+    type: 'SCRAPING_TASK',
+    payload: {
+        url: 'www.example.com',
+        jQuerySelector: 'div'
+    } 
+    
 };
 
 const defaultPendingAction = {
@@ -83,8 +82,6 @@ it('mock store is set up correctly', () => {
             it('should dispatch ACTION_PENDING', () => {
                 // CREATE A MOCK RESPONSE FROM SERVER I.E  mockAxiosClient.onGet('/test').reply(200, 'response');
                 // DISPATCH INITIAL ACTION
-
-
 
                 const expectActions = [defaultScrapingAction, defaultPendingAction]
                 const store = mockStore();
@@ -154,16 +151,15 @@ it('mock store is set up correctly', () => {
   });
 })
 
+
   describe('isScrapingTask', () => {
     it('should return true for actions that are scraping tasks', () => {
         const actionObj = {
             type: 'SCRAPING_TASK',
             payload: {
-               scrapeTask: {
                 url: 'www.example.com',
                 jQuerySelector: 'div'
                } 
-            }
         };
 
       expect(isScrapingTask(actionObj)).to.be.true; 
