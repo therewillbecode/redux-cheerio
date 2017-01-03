@@ -1,8 +1,7 @@
 import { expect } from 'chai';
 import scraperMiddleware, { isScrapingTask } from '../src/index';
 import configureStore from 'redux-mock-store';
-
-
+import nock from 'nock';
 
 describe('scraper middleware', () => {
 const middlewares = [scraperMiddleware]
@@ -15,7 +14,7 @@ let rejectedAction;
 const defaultScrapingAction = {
     type: 'SCRAPING_TASK',
     payload: {
-        url: 'www.example.com',
+        url: 'http://www.example.com',
         jQuerySelector: 'div'
     } 
     
@@ -81,17 +80,30 @@ it('mock store is set up correctly', () => {
 
             it('should dispatch ACTION_PENDING', () => {
                 // CREATE A MOCK RESPONSE FROM SERVER I.E  mockAxiosClient.onGet('/test').reply(200, 'response');
-                // DISPATCH INITIAL ACTION
 
-                const expectActions = [defaultScrapingAction, defaultPendingAction]
-                const store = mockStore();
-                return store.dispatch(expectActions[0]).then(() => {
-                  expect(store.getActions()).to.shallowDeepEqual(expectActions);
-              })
+                // Initialize mockstore with empty state
+                const initialState = {}
+                const store = mockStore(initialState)
+
+                // Dispatch the action
+                store.dispatch(defaultScrapingAction)
+
+                // Test if your store dispatched the expected actions
+                const actions = store.getActions()
+                const expectedPayload = defaultScrapingAction
+                expect(actions).contain(defaultScrapingAction)
             });
 
-            it('should dispatch ACTION_FULFILLED', () => {
+            it('should dispatch ACTION_FULFILLED', () => { 
                 // CREATE A MOCK RESPONSE FROM SERVER I.E  mockAxiosClient.onGet('/test').reply(200, 'response');
+                nock("http://www.example.com")
+                    .filteringPath(function(path){
+                        return '/';
+                    })
+                    .get("/")
+                    .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
+
+
                 // DISPATCH INITIAL ACTION
 
                 const expectActions = [defaultScrapingAction, defaultPendingAction, defaultFulfilledAction]
@@ -157,7 +169,7 @@ it('mock store is set up correctly', () => {
         const actionObj = {
             type: 'SCRAPING_TASK',
             payload: {
-                url: 'www.example.com',
+                url: 'http://www.example.com',
                 jQuerySelector: 'div'
                } 
         };
