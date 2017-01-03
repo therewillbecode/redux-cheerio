@@ -3,12 +3,21 @@ Cheerio middleware for Redux - redux middleware
 
 Scrape in a declarative manner in Redux. Just create an action with a url and a function representing a scraping task.
 
-Scraping is done using Cheerio and axios
+Dispatch an action with a jquery selector and a url and the resulting data or error will be sent
+through the rest of your middleware and end up in your reducer.
+
+Therefore the state of your app can be modified according to the state of other websites.
+
+uses - 
+
+1. logging other websites and tracking given selectors over time
+2. keeping your app in sync with data from websites that do not have an api
+
+Scraping is done using axios for requests and cheerio for parsing the dom
 
 ## Rationale
 
 Decompose complex web scraping workflows into discrete redux actions that represent small scraping tasks.
-
 
 First, install with npm: npm i redux-scraper -S
 
