@@ -1,6 +1,8 @@
 # cheerio-scraper
 Cheerio middleware for Redux - redux middleware
 
+Scrape in a declarative manner in Redux. Just create an action with a url and a function representing a scraping task.
+
 Scraping is done using Cheerio and axios
 
 ## Rationale
