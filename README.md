@@ -30,26 +30,36 @@ composeStoreWithMiddleware = applyMiddleware(
 )(createStore);
 
 
-To use the middleware, dispatch an action that has a payload property that is an object.
+To use the middleware, dispatch an action that has a payload property the props that define the scraping task
 
 This object must consist of a url and callback function
-const payload = { 
-   url: 'www.newsite.com/article/1',
+const defaultScrapingAction = {
+    type: 'SCRAPING_TASK',
+    payload: {
+        url: 'http://www.example.com',
+        jQuerySelector: 'div'
+    } 
+    
+};
 
-payload: {
-            scrapeTask {
-              url: 'www.newsite.com/article/1',
-              task: () => $('div').text
-            } 
-         }
+## Composability
 
-const foo = () => ({
-  type: 'GET_NEWS_ARTICLE',
-  payload
-});
+scraper actions return promises meaning that scraping tasks can be chained.
 
+I.e the results of one scrape will set the course of action for the next scraping task.
 
-The action will return a promise.
+Promise.all([
+  dispatch(ScrapeLocationList()),
+  dispatch(ScrapeLocationMapping())
+]).then((scrapedData) => {
+  dispatch(
+    scrapeLocations(locations=data)
+  )
+})
+
+## INTERNALS
+
+The first scraping task action will return a promise.
 
 
 After the promise is settled, a second action will be dispatched. 
@@ -72,19 +82,3 @@ If the the promise is resolved, e.g., if it was successful, a "fulfilled" action
     ...
   }
 }
-
-
-## Composability
-
-scraper actions return promises meaning that scraping tasks can be chained.
-
-I.e the results of one scrape will set the course of action for the next scraping task.
-
-Promise.all([
-  dispatch(ScrapeLocationList()),
-  dispatch(ScrapeLocationMapping())
-]).then((scrapedData) => {
-  dispatch(
-    scrapeLocations(locations=data)
-  )
-})
