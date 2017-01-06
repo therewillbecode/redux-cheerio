@@ -2,6 +2,36 @@ import { expect } from 'chai';
 import scraperMiddleware, { isScrapingTask } from '../src/index';
 import configureStore from 'redux-mock-store';
 import nock from 'nock';
+import sinon from 'sinon';
+
+const defaultScrapingAction = {
+        type: 'SCRAPING_TASK',
+        payload: {
+            url: 'http://www.example.com',
+            task: ($) => $('div').text()
+        }
+    };
+
+const defaultPendingAction = {
+    type: 'SCRAPING_TASK_PENDING',
+    payload: {
+        url: 'http://www.example.com',
+        task: ($) => $('div').text()
+    }
+}
+
+const defaultFulfilledAction = {
+    type: 'SCRAPING_TASK_FULFILLED',
+    task: ($) => $('div').text(),
+    payload: 'promiseValue'
+};
+
+const defaultRejectedAction = {
+    type: 'SCRAPING_TASK_REJECTED',
+    task: ($) => $('div').text(),
+    error: true,
+    payload: 'promiseReason'
+};
 
 describe('scraper middleware', () => {
     const middlewares = [scraperMiddleware]
@@ -12,34 +42,6 @@ describe('scraper middleware', () => {
         dispatch: doDispatch,
         getState: doGetState
     });
-
-    const defaultScrapingAction = {
-        type: 'SCRAPING_TASK',
-        payload: {
-            url: 'http://www.example.com',
-            jQuerySelector: 'div'
-        }
-    };
-
-    const defaultPendingAction = {
-        type: 'SCRAPING_TASK_PENDING',
-        payload: {
-            url: 'http://www.example.com',
-            jQuerySelector: 'div'
-        }
-    }
-
-
-    const defaultFulfilledAction = {
-        type: 'SCRAPING_TASK_FULFILLED',
-        payload: 'promiseValue'
-    };
-
-    const defaultRejectedAction = {
-        type: 'SCRAPING_TASK_REJECTED',
-        error: true,
-        payload: 'promiseReason'
-    };
 
     // test first nested function in middleware
     it('middleware must return a function to handle next', () => {
@@ -70,9 +72,10 @@ describe('scraper middleware', () => {
                   store.dispatch(defaultScrapingAction)
 
                   // Test if your store dispatched the expected actions
-                  const actions = store.getActions()
-                  const expectedPayload = [defaultPendingAction, defaultScrapingAction]
-                  expect(actions).eql(expectedPayload)
+                  const actionsTypes = store.getActions().map(e => e.type)
+                  const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING']
+
+                  expect(actionsTypes).has.members(expectedActionTypes);
                 })
 
 
@@ -93,13 +96,16 @@ describe('scraper middleware', () => {
                     store.dispatch(defaultScrapingAction)
 
                     // Test if your store dispatched the expected actions
-                    const actions = store.getActions()
-                    const expectedPayload = defaultPendingAction
-                    expect(actions).contain(expectedPayload)
+                           // Test if your store dispatched the expected actions
+                  const actionsTypes = store.getActions().map(e => e.type)
+                  const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING']
+
+                  expect(actionsTypes).has.members(expectedActionTypes);
+                  expect(actionsTypes.length).equal(2);
+
                 });
 
                 it('should dispatch ACTION_FULFILLED once', () => {
-                    // CREATE A MOCK RESPONSE FROM SERVER I.E  mockAxiosClient.onGet('/test').reply(200, 'response');
                     nock("http://www.example.com")
                         .filteringPath(function(path) {
                             return '/';
@@ -107,26 +113,102 @@ describe('scraper middleware', () => {
                         .get("/")
                         .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
 
-                    // DISPATCH INITIAL ACTION
+                    const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING', 'SCRAPING_TASK_FULFILLED']
+                    
+                    // Initialize mockstore with empty state
+                    const initialState = {}
+                    const store = mockStore(initialState)
 
-                    const expectActions = [defaultScrapingAction, defaultPendingAction, defaultFulfilledAction]
+
+                    // Dispatch the action
+                    store.dispatch(defaultScrapingAction)
+
+                    const actionsTypes = store.getActions().map(e => e.type)
+                                        console.log(actionsTypes )
+                    expect(actionsTypes).has.members(expectedActionTypes);
+                    expect(actionsTypes.length).equal(3);       
+                });
+
+
+                it('ACTION_FULFILLED should contain scraped data', () => {
+                    nock("http://www.example.com")
+                        .filteringPath(function(path) {
+                            return '/';
+                        })
+                        .get("/")
+                        .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
+
+                    const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING', 'SCRAPING_TASK_FULFILLED']
                     const store = mockStore();
-                    return store.dispatch(expectActions[0]).then(() => {
-                        expect(store.getActions()).to.eql(expectActions);
-                    })
 
+                    // Dispatch the action
+                    store.dispatch(defaultScrapingAction)
+
+                    const fulfilledAction = store.getActions().filter(e => e.type === 'SCRAPING_TASK_FULFILLED')
+                    expect(fulfilledAction.parsedData).eql('text');   
                 });
 
                 it('should dispatch ACTION_REJECTED once', () => {
-                    // CREATE A MOCK RESPONSE FROM SERVER I.E  mockAxiosClient.onGet('/test').reply(200, 'response');
-                    // DISPATCH INITIAL ACTION
+                    const errMsg = '404 Error - not found'
+                    nock("http://www.example.com")
+                        .filteringPath(function(path) {
+                            return '/';
+                        })
+                        .get("/")
+                        .reply(404, errMsg);
 
-                    const expectActions = [defaultScrapingAction, defaultPendingAction, defaultRejectedAction]
+                    const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING', 'SCRAPING_TASK_REJECTED']
                     const store = mockStore();
-                    return store.dispatch(expectActions[0]).then(() => {
-                        expect(store.getActions()).to.eql(expectActions);
-                    })
+
+                    // Dispatch the action
+                    store.dispatch(defaultScrapingAction)
+
+                    const actionsTypes = store.getActions().map(e => e.type)
+                    expect(actionsTypes).has.members(expectedActionTypes);
+                    expect(actionsTypes.length).equal(3);       
                 });
+
+                it('ACTION_REJECTED should contain error object', () => {
+                     // CREATE A MOCK RESPONSE FROM SERVER I.E  mockAxiosClient.onGet('/test').reply(200, 'response');
+                    const errMsg = '404 Error - not found'
+                    nock("http://www.example.com")
+                        .filteringPath(function(path) {
+                            return '/';
+                        })
+                        .get("/")
+                        .reply(404, errMsg);
+
+                    const store = mockStore();
+
+                    // Dispatch the action
+                    store.dispatch(defaultScrapingAction)
+
+                    const actionsTypes = store.getActions().map(e => e.type)
+                    expect(actionsTypes.length).equal(3);       
+                });
+
+                it('rejected promise should contain cheerio error message', () => {
+                    // CREATE A MOCK RESPONSE FROM SERVER I.E  mockAxiosClient.onGet('/test').reply(200, 'response');
+                     // CREATE A MOCK RESPONSE FROM SERVER I.E  mockAxiosClient.onGet('/test').reply(200, 'response');
+                    const errMsg = '404 Error - not found'
+                    nock("http://www.example.com")
+                        .filteringPath(function(path) {
+                            return '/';
+                        })
+                        .get("/")
+                        .reply(404, errMsg);
+
+                    const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING', 'SCRAPING_TASK_REJECTED']
+                    const store = mockStore();
+
+                    // Dispatch the action
+                    store.dispatch(defaultScrapingAction)
+
+                    const actionsTypes = store.getActions().map(e => e.type)
+                    expect(actionsTypes).has.members(expectedActionTypes);
+                    expect(actionsTypes.length).equal(3);       
+                });
+
             });
 
             describe('when action is not a scraping task', () => {
@@ -166,22 +248,21 @@ describe('scraper middleware', () => {
     });
 })
 
-
 describe('isScrapingTask', () => {
     it('should return true for actions that are scraping tasks', () => {
         const actionObj = {
             type: 'SCRAPING_TASK',
             payload: {
                 url: 'http://www.example.com',
-                jQuerySelector: 'div'
+                task: () => null
             }
         };
-
         expect(isScrapingTask(actionObj)).to.be.true;
     });
 
     it('should return false for actions that are not scraping tasks', () => {
         const actionObj = {};
         expect(isScrapingTask(actionObj)).to.be.false;
-    });
+        expect(isScrapingTask(defaultPendingAction)).to.be.false;
+    })
 });
