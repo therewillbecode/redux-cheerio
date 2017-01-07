@@ -3,7 +3,6 @@ import scraperMiddleware, { isScrapingTask } from '../src/index';
 import configureStore from 'redux-mock-store';
 import nock from 'nock';
 import sinon from 'sinon';
-
 const defaultScrapingAction = {
         type: 'SCRAPING_TASK',
         payload: {
@@ -124,7 +123,7 @@ describe('scraper middleware', () => {
                     store.dispatch(defaultScrapingAction)
 
                     const actionsTypes = store.getActions().map(e => e.type)
-                                        console.log(actionsTypes )
+                    console.log(actionsTypes )
                     expect(actionsTypes).has.members(expectedActionTypes);
                     expect(actionsTypes.length).equal(3);       
                 });
@@ -184,7 +183,10 @@ describe('scraper middleware', () => {
                     store.dispatch(defaultScrapingAction)
 
                     const actionsTypes = store.getActions().map(e => e.type)
-                    expect(actionsTypes.length).equal(3);       
+                    console.log(actionsTypes)
+                    expect(actionsTypes.length).equal(3);  
+
+
                 });
 
                 it('rejected promise should contain cheerio error message', () => {
@@ -204,9 +206,10 @@ describe('scraper middleware', () => {
                     // Dispatch the action
                     store.dispatch(defaultScrapingAction)
 
+
                     const actionsTypes = store.getActions().map(e => e.type)
-                    expect(actionsTypes).has.members(expectedActionTypes);
                     expect(actionsTypes.length).equal(3);       
+                    expect(actionsTypes).has.members(expectedActionTypes);
                 });
 
             });

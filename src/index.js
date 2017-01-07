@@ -20,20 +20,18 @@ export function isScrapingTask(action){
    }
     return false
 }
-var d = null
+
 
 function createScraperMiddleware() {
 	return ({ dispatch, getState }) => next => action => {
 
 	  if (isScrapingTask(action)===true){
-      
       const pendingAction = {
         type: `${action.type}_PENDING`,
         payload: action.payload
       }
 
       dispatch(pendingAction)
-     d= dispatch
       
       axios.get(action.payload.url)
             .then(response => {
@@ -47,11 +45,16 @@ function createScraperMiddleware() {
                 }
               }
 
-              d(fulfilledAction)
-
             })
             .catch( err => {
+                const rejectedAction = {
+                type: `${action.type}_REJECTED`, 
+                payload: { 
+                  err 
+                }
+              }
 
+              dispatch(rejectedAction)
              });
 	   }
   

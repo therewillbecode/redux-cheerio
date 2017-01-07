@@ -1,6 +1,20 @@
 # cheerio-scraper
 Cheerio middleware for Redux - redux middleware
 
+#Rationale
+Flux implementation is a useful mental model for webscraping.
+
+The model
+
+1. Actions are attempts to extract data from the outside world
+2. These actions return raw information about the outside world to the reducers
+3. Reducers then extract the valueable information from this raw data and place it in the store
+4. We can now dispatch more informed actions based on the data we extracted in the previous round
+
+
+## Background
+
+
 Scrape in a declarative manner in Redux. Just create an action with a url and a function representing a scraping task.
 
 Dispatch an action with a jquery selector and a url and the resulting data or error will be sent
@@ -14,8 +28,6 @@ uses -
 2. keeping your app in sync with data from websites that do not have an api
 
 Scraping is done using axios for requests and cheerio for parsing the dom
-
-## Rationale
 
 Decompose complex web scraping workflows into discrete redux actions that represent small scraping tasks.
 
@@ -37,7 +49,10 @@ const defaultScrapingAction = {
     type: 'SCRAPING_TASK',
     payload: {
         url: 'http://www.example.com',
-        jQuerySelector: 'div'
+        task: ($) => {
+                     /* Parse HTML with jQuery Selector /* 
+                     return $('div').text
+                     } 
     } 
     
 };
