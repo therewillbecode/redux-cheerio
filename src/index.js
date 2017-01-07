@@ -33,8 +33,9 @@ function createScraperMiddleware() {
 
       dispatch(pendingAction)
       
-      axios.get(action.payload.url)
+      return axios.get(action.payload.url)
             .then(response => {
+             // console.log(response)
               let $ = cheerio.load(response.data)
               let parsedData = action.payload.task($)
              
@@ -45,8 +46,10 @@ function createScraperMiddleware() {
                 }
               }
 
+              dispatch(fulfilledAction)
+
             })
-            .catch( err => {
+            .catch(err => {
                 const rejectedAction = {
                 type: `${action.type}_REJECTED`, 
                 payload: { 
@@ -55,9 +58,9 @@ function createScraperMiddleware() {
               }
 
               dispatch(rejectedAction)
-             });
-	   }
-  
+            });
+     }
+
 		return next(action);
 	}
 }
