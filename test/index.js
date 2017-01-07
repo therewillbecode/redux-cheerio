@@ -58,6 +58,21 @@ describe('scraper middleware', () => {
             expect(actionHandler).to.be.a('function')
         });
 
+               it('SCRAPING_TASK should return promise when dispatched', () => {
+                    nock("http://www.example.com")
+                        .filteringPath(function(path) {
+                            return '/';
+                        })
+                        .get("/")
+                        .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
+
+                    // Initialize mockstore with empty state
+                    const initialState = {}
+                    const store = mockStore(initialState)
+
+                    expect(store.dispatch(defaultScrapingAction)).to.be.a(Promise)
+                });
+
         describe('handles actions', () => {
             describe('when action is a scraping task correct actions are dispatched', (done) => {
 
@@ -85,6 +100,8 @@ describe('scraper middleware', () => {
                         expect(actionsTypes.length).equal(2);
 
                         done()
+                    }).catch(err => {
+                        done()
                     })
                 })
 
@@ -100,21 +117,15 @@ describe('scraper middleware', () => {
                     const initialState = {}
                     const store = mockStore(initialState)
 
-                    // Test if your store dispatched the expected actions
-                    const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING']
-
-                    store.dispatch(defaultScrapingAction).then(res => {
-
-                        const actionsTypes = store.getActions().map(e => e.type)
-                        expect(actionsTypes).has.members(expectedActionTypes);
-                        expect(actionsTypes.length).equal(2);
-
-                        done()
+                    return store.dispatch(defaultScrapingAction).then(res => {
+                        expect(store.getActions()
+                                    .filter(e => e.type === 'SCRAPING_TASK_PENDING')
+                                    .length
+                                    ).to.equal(1)
                     })
-
                 });
 
-                it('should dispatch ACTION_FULFILLED once', (done) => {
+                it('should dispatch ACTION_FULFILLED once', () => {
                     nock("http://www.example.com")
                         .filteringPath(function(path) {
                             return '/';
@@ -122,24 +133,16 @@ describe('scraper middleware', () => {
                         .get("/")
                         .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
 
-                    const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING', 'SCRAPING_TASK_FULFILLED']
-
                     // Initialize mockstore with empty state
                     const initialState = {}
                     const store = mockStore(initialState)
 
-                    // Dispatch the action
-                    store.dispatch(defaultScrapingAction).then(data => {
-
-                        const actionsTypes = store.getActions().map(e => e.type)
-                        expect(actionsTypes).has.members(expectedActionTypes);
-                        expect(actionsTypes.length).equal(3);
-                        done()
-
-                    }).catch(err => {
-                        done()
+                    return store.dispatch(defaultScrapingAction).then(res => {
+                        expect(store.getActions()
+                                    .filter(e => e.type === 'SCRAPING_TASK_FULFILLED')
+                                    .length
+                                    ).to.equal(1)
                     })
-
                 });
 
 
@@ -150,19 +153,16 @@ describe('scraper middleware', () => {
                         })
                         .get("/")
                         .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
-
-                    const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING', 'SCRAPING_TASK_FULFILLED']
+                
                     const store = mockStore();
-
-                    store.dispatch(defaultScrapingAction).then(res => {
-
-                            const fulfilledAction = store.getActions().filter(e => e.type === 'SCRAPING_TASK_FULFILLED')
-                            expect(fulfilledAction.parsedData).eql('text');
-                            done()
-                        })
-                        .catch(err => {
-                            done()
-                        })
+                   
+                    return store.dispatch(defaultScrapingAction).then(res => {
+                        expect(store.getActions()
+                                    .filter(e => e.type === 'SCRAPING_TASK_FULFILLED')[0]
+                                    .payload
+                                    .parsedData
+                                    ).to.equal('text')
+                    })
                 });
 
                 it('should dispatch ACTION_REJECTED once', () => {
@@ -174,17 +174,13 @@ describe('scraper middleware', () => {
                         .get("/")
                         .reply(404, errMsg);
 
-                    const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING', 'SCRAPING_TASK_REJECTED']
                     const store = mockStore();
-                    store.dispatch(defaultScrapingAction).then(res => {
-
-                        const actionsTypes = store.getActions().map(e => e.type)
-                        expect(actionsTypes).has.members(expectedActionTypes);
-                        expect(actionsTypes.length).equal(3);
-
-                        done()
-                    }).catch(err => {
-                        done()
+                   
+                    return store.dispatch(defaultScrapingAction).then(res => {
+                        expect(store.getActions()
+                                    .filter(e => e.type === 'SCRAPING_TASK_REJECTED')
+                                    .length
+                                    ).to.equal(1)
                     })
                 });
 
@@ -198,16 +194,14 @@ describe('scraper middleware', () => {
                         .reply(404, errMsg);
 
                     const store = mockStore();
-
-                    store.dispatch(defaultScrapingAction).then(res => {
-
-                            const rejectedAction = store.getActions().filter(e => e.type === 'SCRAPING_TASK_REJECTED')
-                            expect(rejectedAction.err).eql(errMsg);
-                            done()
-                        })
-                        .catch(err => {
-                            done()
-                        })
+                   
+                    return store.dispatch(defaultScrapingAction).then(res => {
+                        expect(store.getActions()
+                                    .filter(e => e.type === 'SCRAPING_TASK_REJECTED')[0]
+                                    .payload
+                                    .err
+                                    ).to.equal('error oops')
+                    })
                 });
 
                 it('rejected promise should contain cheerio error message', () => {
@@ -219,18 +213,15 @@ describe('scraper middleware', () => {
                         .get("/")
                         .reply(404, errMsg);
 
-                    const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING', 'SCRAPING_TASK_REJECTED']
                     const store = mockStore();
 
-                    store.dispatch(defaultScrapingAction).then(res => {
-
-                            const rejectedAction = store.getActions().filter(e => e.type === 'SCRAPING_TASK_REJECTED')
-                            expect(rejectedAction.err).eql(errMsg);
-                            done()
-                        })
-                        .catch(err => {
-                            done()
-                        })
+                    return store.dispatch(defaultScrapingAction).then(res => {
+                        expect(store.getActions()
+                                    .filter(e => e.type === 'SCRAPING_TASK_REJECTED')[0]
+                                    .payload
+                                    .err
+                                    ).to.equal('error oops')
+                    })
                 });
 
             });
