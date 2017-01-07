@@ -1,0 +1,51 @@
+{
+  "name": "redux-scraper",
+  "version": "1.0.0",
+  "description": "cheerio based Web scraping middleware for Redux - run cheerio scripts as redux middleware",
+  "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "axios": "^0.15.3",
+    "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "cheerio": "^0.22.0",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-core": "^6.21.0",
+    "babel-loader": "^6.2.10",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-transform-object-rest-spread": "^6.20.2",
+    "babel-plugin-transform-regenerator": "^6.21.0",
+    "babel-preset-es2015": "^6.18.0",
+    "chai": "^3.5.0",
+    "cross-env": "^3.1.3",
+    "mocha": "^3.2.0",
+    "nock": "^9.0.2",
+    "redux": "^3.6.0",
+    "redux-mock-store": "^1.2.1",
+    "sinon": "^1.17.7",
+    "webpack": "^1.14.0"
+  },
+  "scripts": {
+    "test": "cross-env BABEL_ENV=commonjs mocha --compilers js:babel-core/register --reporter spec test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/therewillbecode/phantomjs-redux.git"
+  },
+  "keywords": [
+    "phantomjs",
+    "redux",
+    "middleware"
+  ],
+  "author": "therewillbecode",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/therewillbecode/phantomjs-redux/issues"
+  },
+  "homepage": "https://github.com/therewillbecode/phantomjs-redux#readme"
+}
