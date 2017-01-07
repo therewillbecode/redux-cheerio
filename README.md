@@ -1,4 +1,4 @@
-# cheerio-scraper
+# redux-scraper
 Cheerio middleware for Redux - redux middleware
 
 #Rationale
