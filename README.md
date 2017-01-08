@@ -23,11 +23,11 @@ To use this piece of middleware, just put it into the middleware chain like you 
 
 ```js
 import { createStore, applyMiddleware, combineReducers } from 'redux';
-import { apiMiddleware } from 'redux-api-middleware';
+import cheerioMiddleware from 'redux-cheerio';
 import reducers from './reducers';
 
 const reducer = combineReducers(reducers);
-const createStoreWithMiddleware = applyMiddleware(apiMiddleware)(createStore);
+const createStoreWithMiddleware = applyMiddleware(cheerioMiddleware)(createStore);
 
 export default function configureStore(initialState) {
   return createStoreWithMiddleware(reducer, initialState);
