@@ -9,9 +9,6 @@ Cheerio [middleware](http://rackt.github.io/redux/docs/advanced/Middleware.html)
 
 Click [here](https://github.com/cheeriojs/cheerio) for more info on Cheerio
 
-
-
-
 ## Installation
 
 ```
