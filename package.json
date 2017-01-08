@@ -32,7 +32,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/therewillbecode/cheerio-redux.git"
+    "url": "git+https://github.com/therewillbecode/redux-cheerio.git"
   },
   "keywords": [
     "cheerio",
@@ -42,7 +42,7 @@
   "author": "therewillbecode",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/therewillbecode/phantomjs-redux/issues"
+    "url": "https://github.com/therewillbecode/redux-cheerio/issues"
   },
-  "homepage": "https://github.com/therewillbecode/phantomjs-redux#readme"
+  "homepage": "https://github.com/therewillbecode/redux-cheerio#readme"
 }
