@@ -3,11 +3,11 @@ import configureStore from 'redux-mock-store';
 import nock from 'nock';
 import axios from 'axios';
 import sinon from 'sinon';
-import scraperMiddleware, { isScrapingTask } from '../src/index';
+import cheerioMiddleware, { isCheerioTask } from '../src/index';
 
 
-const defaultScrapingAction = {
-    type: 'SCRAPING_TASK',
+const defaultCheerioAction = {
+    type: 'CHEERIO_TASK',
     payload: {
         url: 'http://www.example.com',
         task: ($) => $('div').text()
@@ -15,7 +15,7 @@ const defaultScrapingAction = {
 };
 
 const defaultPendingAction = {
-    type: 'SCRAPING_TASK_PENDING',
+    type: 'CHEERIO_TASK_PENDING',
     payload: {
         url: 'http://www.example.com',
         task: ($) => $('div').text()
@@ -23,25 +23,24 @@ const defaultPendingAction = {
 }
 
 const defaultFulfilledAction = {
-    type: 'SCRAPING_TASK_FULFILLED',
+    type: 'CHEERIO_TASK_FULFILLED',
     task: ($) => $('div').text(),
     payload: 'promiseValue'
 };
 
 const defaultRejectedAction = {
-    type: 'SCRAPING_TASK_REJECTED',
+    type: 'CHEERIO_TASK_REJECTED',
     task: ($) => $('div').text(),
     error: true,
     payload: 'promiseReason'
 };
 
-
-describe('scraper middleware', () => {
-    const middlewares = [scraperMiddleware]
+describe('Cheerio middleware', () => {
+    const middlewares = [cheerioMiddleware]
     const mockStore = configureStore(middlewares)
     const doDispatch = () => {};
     const doGetState = () => {};
-    const nextHandler = scraperMiddleware({
+    const nextHandler = cheerioMiddleware({
         dispatch: doDispatch,
         getState: doGetState
     });
@@ -59,7 +58,7 @@ describe('scraper middleware', () => {
         });
 
         describe('handles actions', () => {
-            describe('when action is a scraping task correct actions are dispatched', () => {
+            describe('when action is a Cheerio task correct actions are dispatched', () => {
                 let store, setupNock = null
                 let initialState = {} 
 
@@ -79,9 +78,9 @@ describe('scraper middleware', () => {
                 it('should dispatch ACTION_PENDING once', () => {
                     setupNock()
 
-                    return store.dispatch(defaultScrapingAction).then(res => {
+                    return store.dispatch(defaultCheerioAction).then(res => {
                         expect(store.getActions()
-                                    .filter(e => e.type === 'SCRAPING_TASK_PENDING')
+                                    .filter(e => e.type === 'CHEERIO_TASK_PENDING')
                                     .length
                                     ).to.equal(1)
                     })
@@ -90,21 +89,21 @@ describe('scraper middleware', () => {
                 it('should dispatch ACTION_FULFILLED once', () => {
                     setupNock()
 
-                    return store.dispatch(defaultScrapingAction).then(res => {
+                    return store.dispatch(defaultCheerioAction).then(res => {
                         expect(store.getActions()
-                                    .filter(e => e.type === 'SCRAPING_TASK_FULFILLED')
+                                    .filter(e => e.type === 'CHEERIO_TASK_FULFILLED')
                                     .length
                                     ).to.equal(1)
                     })
                 });
 
 
-                it('ACTION_FULFILLED should contain scraped data', () => {
+                it('ACTION_FULFILLED should contain parsed data', () => {
                     setupNock()
                                    
-                    return store.dispatch(defaultScrapingAction).then(res => {
+                    return store.dispatch(defaultCheerioAction).then(res => {
                         expect(store.getActions()
-                                    .filter(e => e.type === 'SCRAPING_TASK_FULFILLED')[0]
+                                    .filter(e => e.type === 'CHEERIO_TASK_FULFILLED')[0]
                                     .payload
                                     .parsedData
                                     ).to.equal('text')
@@ -116,9 +115,9 @@ describe('scraper middleware', () => {
                     const statusCode = 404
                     setupNock(statusCode, errMsg)
                    
-                    return store.dispatch(defaultScrapingAction).then(res => {
+                    return store.dispatch(defaultCheerioAction).then(res => {
                         expect(store.getActions()
-                                    .filter(e => e.type === 'SCRAPING_TASK_REJECTED')
+                                    .filter(e => e.type === 'CHEERIO_TASK_REJECTED')
                                     .length
                                     ).to.equal(1)
                     })
@@ -129,9 +128,9 @@ describe('scraper middleware', () => {
                     const statusCode = 404
                     setupNock(statusCode, errMsg)
                    
-                    return store.dispatch(defaultScrapingAction).then(res => {
+                    return store.dispatch(defaultCheerioAction).then(res => {
                         expect(store.getActions()
-                                    .filter(e => e.type === 'SCRAPING_TASK_REJECTED')[0]
+                                    .filter(e => e.type === 'CHEERIO_TASK_REJECTED')[0]
                                     .payload
                                     .err
                                     ).to.be.defined
@@ -143,9 +142,9 @@ describe('scraper middleware', () => {
                     const statusCode = 404
                     setupNock(statusCode, errMsg)
 
-                    return store.dispatch(defaultScrapingAction).then(res => {
+                    return store.dispatch(defaultCheerioAction).then(res => {
                         expect(store.getActions()
-                                    .filter(e => e.type === 'SCRAPING_TASK_REJECTED')[0]
+                                    .filter(e => e.type === 'CHEERIO_TASK_REJECTED')[0]
                                     .payload
                                     .err
                                     ).to.be.defined
@@ -153,7 +152,7 @@ describe('scraper middleware', () => {
                 });
             });
 
-            describe('when action is not a scraping task', () => {
+            describe('when action is not a Cheerio task', () => {
                 it('does not dispatch any other actions', () => {
                     const actionObj = {
                         type: 'ACTION'
@@ -161,12 +160,12 @@ describe('scraper middleware', () => {
                     const initialState = {}
                     const store = mockStore(initialState)
                     const actions = store.getActions()
-                    const expectedPayload = defaultScrapingAction
+                    const expectedPayload = defaultCheerioAction
                     store.dispatch(actionObj)
                     expect(actions).eql([actionObj])
                 });
 
-                it('must pass action to next if not a scraping task', done => {
+                it('must pass action to next if not a Cheerio task', done => {
                     const actionObj = {
                         type: 'ACTION'
                     };
@@ -181,21 +180,21 @@ describe('scraper middleware', () => {
     });
 })
 
-describe('isScrapingTask', () => {
-    it('should return true for actions that are scraping tasks', () => {
+describe('isCheerioTask', () => {
+    it('should return true for actions that are Cheerio tasks', () => {
         const actionObj = {
-            type: 'SCRAPING_TASK',
+            type: 'CHEERIO_TASK',
             payload: {
                 url: 'http://www.example.com',
                 task: () => null
             }
         };
-        expect(isScrapingTask(actionObj)).to.be.true;
+        expect(isCheerioTask(actionObj)).to.be.true;
     });
 
-    it('should return false for actions that are not scraping tasks', () => {
+    it('should return false for actions that are not Cheerio tasks', () => {
         const actionObj = {};
-        expect(isScrapingTask(actionObj)).to.be.false;
-        expect(isScrapingTask(defaultPendingAction)).to.be.false;
+        expect(isCheerioTask(actionObj)).to.be.false;
+        expect(isCheerioTask(defaultPendingAction)).to.be.false;
     })
 });
