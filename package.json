@@ -1,5 +1,5 @@
 {
-  "name": "cheerio-redux",
+  "name": "redux-cheerio",
   "version": "0.0.1",
   "description": "cheerio based middleware for Redux - run cheerio scripts as redux middleware",
   "main": "src/index.js",
