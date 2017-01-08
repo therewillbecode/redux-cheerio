@@ -35,10 +35,8 @@ function createScraperMiddleware() {
       
       return axios.get(action.payload.url)
             .then(response => {
-             // console.log(response)
               let $ = cheerio.load(response.data)
               let parsedData = action.payload.task($)
-             
               const fulfilledAction = {
                 type: `${action.type}_FULFILLED`, 
                 payload: { 

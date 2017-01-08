@@ -60,11 +60,20 @@ describe('scraper middleware', () => {
 
         describe('handles actions', () => {
             describe('when action is a scraping task correct actions are dispatched', () => {
-                let store = null
+                let store, setupNock = null
                 let initialState = {} 
 
                 beforeEach(() => {
                     store = mockStore(initialState)
+                    const defaultResponse = '<!doctype html><html><body><div>text</div></body></html>'
+                    setupNock = (statusCode=200, response=defaultResponse) => {
+                        nock("http://www.example.com")
+                        .filteringPath(function(path) {
+                            return '/';
+                        })
+                        .get("/")
+                        .reply(statusCode, response);
+                    }
                 });
 
                 it('mock store is set up correctly', () => {
@@ -79,12 +88,7 @@ describe('scraper middleware', () => {
                 })
 
                 it('should dispatch ACTION_PENDING once', () => {
-                    nock("http://www.example.com")
-                        .filteringPath(function(path) {
-                            return '/';
-                        })
-                        .get("/")
-                        .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
+                    setupNock()
 
                     return store.dispatch(defaultScrapingAction).then(res => {
                         expect(store.getActions()
@@ -95,12 +99,7 @@ describe('scraper middleware', () => {
                 });
 
                 it('should dispatch ACTION_FULFILLED once', () => {
-                    nock("http://www.example.com")
-                        .filteringPath(function(path) {
-                            return '/';
-                        })
-                        .get("/")
-                        .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
+                    setupNock()
 
                     return store.dispatch(defaultScrapingAction).then(res => {
                         expect(store.getActions()
@@ -112,12 +111,7 @@ describe('scraper middleware', () => {
 
 
                 it('ACTION_FULFILLED should contain scraped data', () => {
-                    nock("http://www.example.com")
-                        .filteringPath(function(path) {
-                            return '/';
-                        })
-                        .get("/")
-                        .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
+                    setupNock()
                                    
                     return store.dispatch(defaultScrapingAction).then(res => {
                         expect(store.getActions()
@@ -130,12 +124,8 @@ describe('scraper middleware', () => {
 
                 it('should dispatch ACTION_REJECTED once', () => {
                     const errMsg = '404 Error - not found'
-                    nock("http://www.example.com")
-                        .filteringPath(function(path) {
-                            return '/';
-                        })
-                        .get("/")
-                        .reply(404, errMsg);
+                    const statusCode = 404
+                    setupNock(statusCode, errMsg)
                    
                     return store.dispatch(defaultScrapingAction).then(res => {
                         expect(store.getActions()
@@ -147,12 +137,8 @@ describe('scraper middleware', () => {
 
                 it('ACTION_REJECTED should contain error object', () => {
                     const errMsg = '404 Error - not found'
-                    nock("http://www.example.com")
-                        .filteringPath(function(path) {
-                            return '/';
-                        })
-                        .get("/")
-                        .reply(404, errMsg);
+                    const statusCode = 404
+                    setupNock(statusCode, errMsg)
                    
                     return store.dispatch(defaultScrapingAction).then(res => {
                         expect(store.getActions()
@@ -165,12 +151,8 @@ describe('scraper middleware', () => {
 
                 it('rejected promise should contain cheerio error message', () => {
                     const errMsg = '404 Error - not found'
-                    nock("http://www.example.com")
-                        .filteringPath(function(path) {
-                            return '/';
-                        })
-                        .get("/")
-                        .reply(404, errMsg);
+                    const statusCode = 404
+                    setupNock(statusCode, errMsg)
 
                     return store.dispatch(defaultScrapingAction).then(res => {
                         expect(store.getActions()
