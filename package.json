@@ -1,17 +1,14 @@
 {
-  "name": "redux-scraper",
+  "name": "cheerio-redux",
   "version": "1.0.0",
-  "description": "cheerio based Web scraping middleware for Redux - run cheerio scripts as redux middleware",
+  "description": "cheerio based middleware for Redux - run cheerio scripts as redux middleware",
   "main": "src/index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
     "axios": "^0.15.3",
-    "chai": "^3.5.0",
-    "chai-as-promised": "^6.0.0",
-    "cheerio": "^0.22.0",
-    "request": "^2.79.0"
+    "cheerio": "^0.22.0"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
@@ -35,10 +32,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/therewillbecode/phantomjs-redux.git"
+    "url": "git+https://github.com/therewillbecode/cheerio-redux.git"
   },
   "keywords": [
-    "phantomjs",
+    "cheerio",
     "redux",
     "middleware"
   ],

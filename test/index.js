@@ -1,9 +1,9 @@
 import { expect } from 'chai';
-import scraperMiddleware, { isScrapingTask } from '../src/index';
 import configureStore from 'redux-mock-store';
 import nock from 'nock';
 import axios from 'axios';
 import sinon from 'sinon';
+import scraperMiddleware, { isScrapingTask } from '../src/index';
 
 
 const defaultScrapingAction = {
@@ -58,51 +58,24 @@ describe('scraper middleware', () => {
             expect(actionHandler).to.be.a('function')
         });
 
-               it('SCRAPING_TASK should return promise when dispatched', () => {
-                    nock("http://www.example.com")
-                        .filteringPath(function(path) {
-                            return '/';
-                        })
-                        .get("/")
-                        .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
-
-                    // Initialize mockstore with empty state
-                    const initialState = {}
-                    const store = mockStore(initialState)
-
-                    expect(store.dispatch(defaultScrapingAction)).to.be.a(Promise)
-                });
-
         describe('handles actions', () => {
-            describe('when action is a scraping task correct actions are dispatched', (done) => {
+            describe('when action is a scraping task correct actions are dispatched', () => {
+                let store = null
+                let initialState = {} 
 
                 beforeEach(() => {
-
-                });
-
-                afterEach(() => {
-
+                    store = mockStore(initialState)
                 });
 
                 it('mock store is set up correctly', () => {
-                    const initialState = {}
-                    const store = mockStore(initialState)
-
-
-                    // Test if your store dispatched the expected actions
                     const actionsTypes = store.getActions().map(e => e.type)
                     const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING']
-
-                    store.dispatch(defaultScrapingAction).then(res => {
-
-                        const actionsTypes = store.getActions().map(e => e.type)
-                        expect(actionsTypes).has.members(expectedActionTypes);
-                        expect(actionsTypes.length).equal(2);
-
-                        done()
-                    }).catch(err => {
-                        done()
-                    })
+                    store.dispatch(defaultScrapingAction)
+                         .then(res => {
+                            const actionsTypes = store.getActions().map(e => e.type)
+                            expect(actionsTypes).has.members(expectedActionTypes);
+                            expect(actionsTypes.length).equal(2);
+                    }).catch(() => {})
                 })
 
                 it('should dispatch ACTION_PENDING once', () => {
@@ -112,10 +85,6 @@ describe('scraper middleware', () => {
                         })
                         .get("/")
                         .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
-
-                    // Initialize mockstore with empty state
-                    const initialState = {}
-                    const store = mockStore(initialState)
 
                     return store.dispatch(defaultScrapingAction).then(res => {
                         expect(store.getActions()
@@ -133,10 +102,6 @@ describe('scraper middleware', () => {
                         .get("/")
                         .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
 
-                    // Initialize mockstore with empty state
-                    const initialState = {}
-                    const store = mockStore(initialState)
-
                     return store.dispatch(defaultScrapingAction).then(res => {
                         expect(store.getActions()
                                     .filter(e => e.type === 'SCRAPING_TASK_FULFILLED')
@@ -153,9 +118,7 @@ describe('scraper middleware', () => {
                         })
                         .get("/")
                         .reply(200, '<!doctype html><html><body><div>text</div></body></html>');
-                
-                    const store = mockStore();
-                   
+                                   
                     return store.dispatch(defaultScrapingAction).then(res => {
                         expect(store.getActions()
                                     .filter(e => e.type === 'SCRAPING_TASK_FULFILLED')[0]
@@ -173,8 +136,6 @@ describe('scraper middleware', () => {
                         })
                         .get("/")
                         .reply(404, errMsg);
-
-                    const store = mockStore();
                    
                     return store.dispatch(defaultScrapingAction).then(res => {
                         expect(store.getActions()
@@ -192,15 +153,13 @@ describe('scraper middleware', () => {
                         })
                         .get("/")
                         .reply(404, errMsg);
-
-                    const store = mockStore();
                    
                     return store.dispatch(defaultScrapingAction).then(res => {
                         expect(store.getActions()
                                     .filter(e => e.type === 'SCRAPING_TASK_REJECTED')[0]
                                     .payload
                                     .err
-                                    ).to.equal('error oops')
+                                    ).to.be.defined
                     })
                 });
 
@@ -213,17 +172,14 @@ describe('scraper middleware', () => {
                         .get("/")
                         .reply(404, errMsg);
 
-                    const store = mockStore();
-
                     return store.dispatch(defaultScrapingAction).then(res => {
                         expect(store.getActions()
                                     .filter(e => e.type === 'SCRAPING_TASK_REJECTED')[0]
                                     .payload
                                     .err
-                                    ).to.equal('error oops')
+                                    ).to.be.defined
                     })
                 });
-
             });
 
             describe('when action is not a scraping task', () => {
@@ -231,15 +187,11 @@ describe('scraper middleware', () => {
                     const actionObj = {
                         type: 'ACTION'
                     };
-
                     const initialState = {}
                     const store = mockStore(initialState)
-
-                    store.dispatch(actionObj)
-
-                    // Test if your store dispatched the expected actions
                     const actions = store.getActions()
                     const expectedPayload = defaultScrapingAction
+                    store.dispatch(actionObj)
                     expect(actions).eql([actionObj])
                 });
 
@@ -247,17 +199,14 @@ describe('scraper middleware', () => {
                     const actionObj = {
                         type: 'ACTION'
                     };
-
                     const actionHandler = nextHandler(action => {
                         expect(action).to.eql(actionObj);
                         done();
                     });
-
                     actionHandler(actionObj);
                 });
             });
         });
-
     });
 })
 

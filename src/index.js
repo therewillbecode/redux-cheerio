@@ -68,4 +68,3 @@ function createScraperMiddleware() {
 const scraperMiddleware = createScraperMiddleware();
 
 export default scraperMiddleware;
-
