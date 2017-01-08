@@ -4,12 +4,12 @@ import cheerio from 'cheerio';
 const isString = (myVar) =>  typeof myVar === 'string' || myVar instanceof String
 
 // verifies that action should be handled by middleware
-export function isScrapingTask(action){
+export function isCheerioTask(action){
 		try {
       // TODO MOVE INTO OWN FUNC
       if(typeof action.payload.task === 'function'  
          && isString(action.payload.url) === true
-         && action.type === "SCRAPING_TASK") {
+         && action.type === "CHEERIO_TASK") {
         return true
       }
    }
@@ -22,10 +22,10 @@ export function isScrapingTask(action){
 }
 
 
-function createScraperMiddleware() {
+function createCheerioMiddleware() {
 	return ({ dispatch, getState }) => next => action => {
 
-	  if (isScrapingTask(action)===true){
+	  if (isCheerioTask(action)===true){
       const pendingAction = {
         type: `${action.type}_PENDING`,
         payload: action.payload
@@ -33,11 +33,10 @@ function createScraperMiddleware() {
 
       dispatch(pendingAction)
       
-      axios.get(action.payload.url)
+      return axios.get(action.payload.url)
             .then(response => {
               let $ = cheerio.load(response.data)
               let parsedData = action.payload.task($)
-             
               const fulfilledAction = {
                 type: `${action.type}_FULFILLED`, 
                 payload: { 
@@ -45,8 +44,10 @@ function createScraperMiddleware() {
                 }
               }
 
+              dispatch(fulfilledAction)
+
             })
-            .catch( err => {
+            .catch(err => {
                 const rejectedAction = {
                 type: `${action.type}_REJECTED`, 
                 payload: { 
@@ -55,14 +56,13 @@ function createScraperMiddleware() {
               }
 
               dispatch(rejectedAction)
-             });
-	   }
-  
+            });
+     }
+
 		return next(action);
 	}
 }
 
-const scraperMiddleware = createScraperMiddleware();
+const cheerioMiddleware = createCheerioMiddleware();
 
-export default scraperMiddleware;
-
+export default cheerioMiddleware;
