@@ -76,17 +76,6 @@ describe('scraper middleware', () => {
                     }
                 });
 
-                it('mock store is set up correctly', () => {
-                    const actionsTypes = store.getActions().map(e => e.type)
-                    const expectedActionTypes = ['SCRAPING_TASK', 'SCRAPING_TASK_PENDING']
-                    store.dispatch(defaultScrapingAction)
-                         .then(res => {
-                            const actionsTypes = store.getActions().map(e => e.type)
-                            expect(actionsTypes).has.members(expectedActionTypes);
-                            expect(actionsTypes.length).equal(2);
-                    }).catch(() => {})
-                })
-
                 it('should dispatch ACTION_PENDING once', () => {
                     setupNock()
 
