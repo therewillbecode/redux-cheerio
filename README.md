@@ -1,4 +1,4 @@
-# redux-scraper
+# redux-cheerio
 Cheerio [middleware](http://rackt.github.io/redux/docs/advanced/Middleware.html) for Redux
 
 ##Rationale
@@ -40,7 +40,7 @@ export default function configureStore(initialState) {
 const store = configureStore(initialState);
 ```
 
-## Guide
+## Usage
 
 To use the middleware, dispatch an action takes the following form.
 
