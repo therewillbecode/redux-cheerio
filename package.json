@@ -1,8 +1,8 @@
 {
   "name": "redux-cheerio",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "cheerio based middleware for Redux - run cheerio scripts as redux middleware",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "directories": {
     "test": "test"
   },
@@ -27,8 +27,12 @@
     "sinon": "^1.17.7",
     "webpack": "^1.14.0"
   },
+  "babel": {
+    "presets": ["es2015"]
+  },
   "scripts": {
-    "test": "cross-env BABEL_ENV=commonjs mocha --compilers js:babel-core/register --reporter spec test/*.js"
+    "test": "cross-env BABEL_ENV=commonjs mocha --compilers js:babel-core/register --reporter spec test/*.js",
+    "prepublish": "node_modules/babel-cli/bin/babel.js src --out-dir lib"
   },
   "repository": {
     "type": "git",
@@ -37,7 +41,11 @@
   "keywords": [
     "cheerio",
     "redux",
-    "middleware"
+    "middleware",
+    "request",
+    "webscraping",
+    "fetch",
+    "axios"
   ],
   "author": "therewillbecode",
   "license": "ISC",

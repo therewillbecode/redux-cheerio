@@ -1,25 +1,25 @@
 # redux-cheerio
 Cheerio [middleware](http://rackt.github.io/redux/docs/advanced/Middleware.html) for Redux
 
-##Rationale
+## Motivation
 
-#### Parse nearly any HTML or XML document from an API by just dispatching an action.
+#### Dispatch a Redux action and get back pretty JSON response.
 
-## Background
+Cheerio works under the hood for parsing the HTML or XML document of HTTP requests. Cheerio uses a very simple, consistent DOM model. As a result parsing, manipulating, and rendering are incredibly efficient.
 
 Click [here](https://github.com/cheeriojs/cheerio) for more info on Cheerio
 
 ## Installation
 
 ```
-npm install cheerioMiddleware --save
+npm install redux-cheerio --save
 ```
 
-To use this piece of middleware, just put it into the middleware chain like you would with any other piece of middleware
+## Guide
 
-## Example
+#### Configure your store with the middleware
 
-#### configureStore.js
+Insert redux-cheerio into the middleware chain like you would with any other piece of middleware.
 
 ```js
 import { createStore, applyMiddleware, combineReducers } from 'redux';
@@ -29,80 +29,134 @@ import reducers from './reducers';
 const reducer = combineReducers(reducers);
 const createStoreWithMiddleware = applyMiddleware(cheerioMiddleware)(createStore);
 
-export default function configureStore(initialState) {
+function configureStore(initialState) {
   return createStoreWithMiddleware(reducer, initialState);
 }
-```
 
-#### app.js
-
-```js
 const store = configureStore(initialState);
 ```
 
+Go to the end of this readme for a full self-contained example of using redux-cheerio
+
 ## Usage
 
-To use the middleware, dispatch an action takes the following form.
+Dispatch actions to your Redux store that have a type of CHEERIO_TASK and a payload consisting of a url to make the request to and a task function whose job is to parse the HTML using jQuery selectors.
 
-This object must consist of a url and function that can take
-Cheerio tasks must take the following format 
 
+
+
+To use the middleware, dispatch an action takes the following form:
 ```js
-const defaultCheerioAction = {
+const whateverNameWeLike = {
     type: 'CHEERIO_TASK',
-    payload: {
-        url: 'http://www.example.com',
-        task: function justACheerioFunc($){ return $('div').text() }
+    payload: { 
+        url: // a string
+        task: // a function
     }
-};  
+};
 ```
 
-## How it works
+#Example
 
-The first cheerio action will return a promise.
+Here is an example action that returns the HTML body of a response as a JSON object. 
 
-After the promise is settled, a second action will be dispatched. 
-
-If the the promise is resolved, e.g., if it was successful, a "fulfilled" action is dispatched. If the promise is rejected, e.g., if an error occurred, the "rejected" action is dispatched. The fulfilled and rejected type suffixes are _FULFILLED and _REJECTED respectively. The middleware will always dispatch one of these two actions.
+Define the first Cheerio action which makes the request
 
 ```js
-// fulfilled action
+const getBodyOfHTML = {
+    type: 'CHEERIO_TASK',
+    payload: {  // the payload properties are customised by you 
+        url: 'http://www.example.com',
+        task: function yourCheerioFuncHere($){ return $('body') }
+    }
+};
+```
+
+Note that in this example we set the following custom payload properties:
+
+#### A url 
+Where the HTTP request will be made to.
+
+#### A function that allows us to use Jquery selectors such as '$(div).text()'
+
+Under the hood our middleware takes the HTML from the response and calls the Cheerio.load function like so
+
+```js
+let $ = cheerio.load(response)
+```
+
+Now we can use jQuery selectors to extract the the data we want from the HTML. This is especially useful for webscraping. We must remember to return the result of this selection.
+
+## Dispatch the first action
+
+Lets dispatch the action to make the request and parse the response with the task function in our action.
+
+```js
+// note that a promise is returned
+store.dispatch(cheerioAction)
+```
+
+Now watch as redux-cheerio handles the dispatching of one further action depending on the success of the HTTP request.
+
+## redux-cheerio middleware dispatches an additional fulfilled action if the request was successful
+
+When our task function returns something a CHEERIO_TASK_FULFILLED action will be dispatched as long as no errors have occured. The payload of this new action will consist of the thing we returned in our task function that was in the first CHEERIO_TASK action.  
+
+```js
 {
   type: 'CHEERIO_TASK_FULFILLED'
   payload: {
-    ...
-  }
-}
-
-// rejected action
-{
-  type: 'CHEERIO_TASK_REJECTED'
-  error: true,
-  payload: {
-    ...
+    'whatever was the result of our $('div').text() jquery selector'
   }
 }
 ```
 
-## Composability
+## redux-cheerio middleware dispatches an additional rejected action if the request was not successful
 
-Cheerio actions return promises meaning that Cheerio tasks can be chained.
+If there was an error during the request such as a timeout or 404 status code then redux-cheerio middleware will dispatch a rejected action instead of a fulfilled one.
 
 ```js
-Promise.all([
-  dispatch(cheerioTask1()),
-  dispatch(cheerioTask2())
-]).then((fetchedData) => {
-  dispatch(
-    cheerioTask3(fetchedData)
-  )
+{
+  type: 'CHEERIO_TASK_REJECTED'
+  payload: {
+    err: { // error defined here} 
+  }
+}
+```
+
+## Full example
+
+```js
+import { createStore, applyMiddleware } from 'redux';
+import cheerioMiddleware from 'redux-cheerio'
+
+// simplest reducer possible - just returns the next state
+const reducer = (state, action) => state
+
+const middleware = [cheerioMiddleware]
+
+const store = createStore(reducer, applyMiddleware(...middleware))); 
+
+// Create a action that follows the redux-cheerio signature
+const cheerioAction = {
+    type: 'CHEERIO_TASK',
+    payload: {  // the payload properties are customised by you 
+        url: 'http://www.example.com',
+        task: function yourCheerioFuncHere($){ return $('body') }
+    }
+};  
+
+// dispatch our action which returns a promise that we can chain with other logic
+store.dispatch(cheerioAction).then(() => {
+  console.log('request successsful')
+}).catch(() => {
+    console.log('request unsuccessful')
 })
 ```
 
-I.e useful for webscraping as the results of one scrape and cheerio parse will set the course of action for the next scraping task.
 
 
-## Webscraping
+## An aside - Webscraping
 
 Flux implementation is a useful mental model for webscraping.
 
