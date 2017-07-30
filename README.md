@@ -1,14 +1,10 @@
 # redux-cheerio
 
-Redux middleware for cheerio 
+Redux middleware for Cheerio 
 
-## Motivation
-
-#### Dispatch a Redux action and get back pretty JSON response.
+#### Dispatch a Redux action and get back a pretty JSON response.
 
 Cheerio works under the hood for parsing the HTML or XML document of HTTP requests. Cheerio uses a very simple, consistent DOM model. As a result parsing, manipulating, and rendering are incredibly efficient.
-
-Click [here](https://github.com/cheeriojs/cheerio) for more info on Cheerio
 
 ## Installation
 
