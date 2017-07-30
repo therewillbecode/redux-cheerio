@@ -84,7 +84,7 @@ let $ = cheerio.load(response)
 
 Now we can use jQuery selectors to extract the the data we want from the HTML. This is especially useful for webscraping. We must remember to return the result of this selection.
 
-## Dispatch the first action
+### Dispatch the first action
 
 Lets dispatch the action to make the request and parse the response with the task function in our action.
 
@@ -95,7 +95,7 @@ store.dispatch(cheerioAction)
 
 Now watch as redux-cheerio handles the dispatching of one further action depending on the success of the HTTP request.
 
-## redux-cheerio middleware dispatches an additional fulfilled action if the request was successful
+### redux-cheerio middleware dispatches an additional fulfilled action if the request was successful
 
 When our task function returns something a CHEERIO_TASK_FULFILLED action will be dispatched as long as no errors have occured. The payload of this new action will consist of the thing we returned in our task function that was in the first CHEERIO_TASK action.  
 
@@ -108,7 +108,7 @@ When our task function returns something a CHEERIO_TASK_FULFILLED action will be
 }
 ```
 
-## redux-cheerio middleware dispatches an additional rejected action if the request was not successful
+### redux-cheerio middleware dispatches an additional rejected action if the request was not successful
 
 If there was an error during the request such as a timeout or 404 status code then redux-cheerio middleware will dispatch a rejected action instead of a fulfilled one.
 
