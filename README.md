@@ -153,32 +153,3 @@ store.dispatch(cheerioAction).then(() => {
     console.log('request unsuccessful')
 })
 ```
-
-
-
-## An aside - Webscraping
-
-Flux implementation is a useful mental model for webscraping.
-
-The webscraping model using cheerio middleware
-
-1. Actions are attempts to extract data from the outside world
-2. These actions return raw information about the outside world to the reducers
-3. Reducers then extract the valueable information from this raw data and place it in the store
-4. We can now dispatch more informed actions based on the data we extracted in the previous round
-
-
-Scrape in a declarative manner in Redux. Just create a cheerio action with a url and a function representing a scraping task.
-
-Decompose complex web scraping workflows into discrete redux actions that represent small scraping tasks.
-
-Dispatch an action with a jquery selector and a url and the resulting data or error will be sent
-through the rest of your middleware and end up in your reducer.
-
-Therefore the state of your app can be modified according to the state of other websites.
-
-#### Example uses for webscraping
-
-1. logging other websites and tracking given selectors over time
-2. keeping your app in sync with data from websites that do not have an api
-
