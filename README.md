@@ -1,5 +1,6 @@
 # redux-cheerio
-Cheerio [middleware](http://rackt.github.io/redux/docs/advanced/Middleware.html) for Redux
+
+Redux middleware for cheerio 
 
 ## Motivation
 
